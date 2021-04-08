@@ -1,4 +1,4 @@
-#include "editorWindow.hpp"
+#include "EditorWindow.hpp"
 
 EditorWindow::EditorWindow(std::string filename, bool runNow)
 {
@@ -9,7 +9,12 @@ EditorWindow::EditorWindow(std::string filename, bool runNow)
 
 char EditorWindow::charIn()
 {
-    return char(_getch());
+	initscr();
+	cbreak();
+	int c = getch();
+    noecho();
+	endwin();
+    return c;
 }
 
 void EditorWindow::mainLoop()

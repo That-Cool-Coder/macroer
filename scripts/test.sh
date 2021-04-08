@@ -1,8 +1,6 @@
 #!/bin/bash
-parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-
-cd "$parent_path"
+cd "${0%/*}"
 
 cd ../scripts
 
-./build.sh && ./run.sh
+sh build.sh && sh run.sh

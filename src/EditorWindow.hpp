@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
-#include <conio.h>
+#include <ncurses.h>
 #include "config.hpp"
 
 void test();
