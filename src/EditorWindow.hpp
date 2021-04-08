@@ -12,12 +12,13 @@ class EditorWindow
 private:
     std::string m_filename;
     std::string m_content;
-
-    char charIn();
+    int m_scrollAmountY;
 
 public:
+
     EditorWindow(std::string filename, bool runNow);
 
     void mainLoop();
     void save();
+    void close();
 };

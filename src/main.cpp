@@ -6,5 +6,6 @@ int main()
 {
     EditorWindow w("test.txt", true);
     w.save();
+    w.close();
     return 0;
 }
