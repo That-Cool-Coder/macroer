@@ -5,20 +5,31 @@
 #include <ncurses.h>
 #include "config.hpp"
 
-void test();
+#define ctrl(x) ((x) & 0x1f)
 
 class EditorWindow
 {
+public:
+
+    EditorWindow(bool runNow);
+    EditorWindow(std::string filename, bool runNow);
+    ~EditorWindow();
+
+    void mainLoop();
+    void loadFromFile();
+    void save();
+    void close(bool forceClose);
+
 private:
     std::string m_filename;
     std::string m_content;
     int m_scrollAmountY;
+    int m_cursorIndex;
 
-public:
-
-    EditorWindow(std::string filename, bool runNow);
-
-    void mainLoop();
-    void save();
-    void close();
+    void setupCurses();
+    void insertChar(char c);
+    void deleteChar();
+    void updateCursorPos();
+    void debugLog(char c);
+    void debugLog(std::string s);
 };
