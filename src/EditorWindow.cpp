@@ -39,9 +39,12 @@ void EditorWindow::mainLoop()
         switch(c)
         {
             case KEY_UP:
-                m_scrollAmountY --;
-                scrl(-1);
-                tryRepaintLine(m_scrollAmountY);
+                if (m_scrollAmountY > 0)
+                {
+                    m_scrollAmountY --;
+                    scrl(-1);
+                    tryRepaintLine(m_scrollAmountY);
+                }
                 break;
             case KEY_DOWN:
                 m_scrollAmountY ++;
