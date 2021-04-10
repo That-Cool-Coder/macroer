@@ -30,6 +30,7 @@ private:
     void insertChar(char c);
     void deleteChar();
     void updateCursorPos();
+    void tryRepaintLine(int lineNum);
     void debugLog(char c);
     void debugLog(std::string s);
 };

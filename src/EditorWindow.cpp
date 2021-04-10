@@ -3,6 +3,8 @@
 EditorWindow::EditorWindow(bool runNow)
 {
     m_filename = "macroer-unnamed.sh";
+    // m_content always has a space at the end to make deleting work,
+    // but users can't interact with it
     m_content = " ";
     m_cursorIndex = 0;
     m_scrollAmountY = 0;
@@ -18,7 +20,6 @@ EditorWindow::EditorWindow(std::string filename, bool runNow)
     m_scrollAmountY = 0;
 
     setupCurses();
-
     loadFromFile();
     if (runNow) mainLoop();
 }
@@ -39,9 +40,13 @@ void EditorWindow::mainLoop()
         {
             case KEY_UP:
                 m_scrollAmountY --;
+                scrl(-1);
+                tryRepaintLine(m_scrollAmountY);
                 break;
             case KEY_DOWN:
                 m_scrollAmountY ++;
+                scrl(1);
+                tryRepaintLine(m_scrollAmountY + LINES);
                 break;
             case KEY_LEFT:
                 if (m_cursorIndex > 0) m_cursorIndex --;
@@ -69,23 +74,24 @@ void EditorWindow::loadFromFile()
 
     std::ifstream file;
     file.open(m_filename);
+    // Add trailing space (see constructor)
     m_content = std::string((std::istreambuf_iterator<char>(file)),
-        std::istreambuf_iterator<char>());
+        std::istreambuf_iterator<char>()) + ' ';
+
     file.close();
 
-    for (auto c : m_content)
-    {
-        insertChar(c);
-    }
-
-    debugLog(m_content);
+    // Write file to window
+    clear();
+    addstr(m_content.c_str());
 }
 
 void EditorWindow::save()
 {
     std::ofstream file;
     file.open(m_filename, std::ios::trunc);
-    file << m_content.substr(0, m_content.length() - 2);
+    // Remove trailing space:
+    file << m_content.substr(0, m_content.length() - 1);
+
     file.close();
 }
 
@@ -102,10 +108,12 @@ void EditorWindow::close(bool forceClose)
 
 void EditorWindow::setupCurses()
 {
-	initscr();
+	WINDOW* win = initscr();
 	cbreak();
     noecho();
-    keypad(stdscr, TRUE);
+    keypad(stdscr, true);
+    scrollok(win, true);
+    keypad(stdscr, true);
 }
 
 void EditorWindow::debugLog(char c)
@@ -157,4 +165,35 @@ void EditorWindow::updateCursorPos()
         else col ++;
     }
     move(row, col);
+}
+
+void EditorWindow::tryRepaintLine(int lineNum)
+{
+    int row = 0;
+    std::string crntLine = "";
+    bool foundCorrectRow = false;
+    for (auto c : m_content)
+    {
+        if (c == '\n')
+        {
+            if (row == lineNum)
+            {
+                foundCorrectRow = true;
+                break;
+            }
+            else
+            {
+                row += 1;
+                crntLine = "";
+            }
+        }
+        else crntLine += c;
+    }
+
+    if (foundCorrectRow)
+    {
+        move(row, 0);
+        addstr(crntLine.c_str());
+        updateCursorPos();
+    }
 }
