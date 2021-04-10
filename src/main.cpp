@@ -3,7 +3,8 @@
 #include "config.hpp"
 #include "EditorWindow.hpp"
 
-#define MACRO_SAVE_FILE_NAME std::string("macroer.sh")
+#define MACRO_SAVE_FILE_NAME "macroer.sh"
+#define DEFAULT_MACRO_FILE_CONTENTS "# Welcome to macroer. To save and exit, press CTRL+X "
 
 std::string macroSaveFilePath;
 
@@ -14,7 +15,7 @@ void showIncorrectArgs()
 
 std::string folderFromPath(std::string str)
 {
-    size_t found = str.find_last_of("/\\");
+    size_t found = str.find_last_of("/");
     return str.substr(0, found);
 }
 
@@ -22,7 +23,7 @@ void clearMacroFile()
 {
     std::ofstream file;
     file.open(macroSaveFilePath, std::ios::trunc);
-    file << "";
+    file << DEFAULT_MACRO_FILE_CONTENTS;
     file.close();
 }
 
@@ -46,4 +47,6 @@ int main(int argc, char* argv[])
             showIncorrectArgs();
     }
     else showIncorrectArgs();
+
+    std::cout << folderFromPath(std::string(argv[0]));
 }
