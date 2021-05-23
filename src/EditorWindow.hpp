@@ -1,11 +1,12 @@
 #pragma once
 #include <iostream>
 #include <fstream>
-#include <stdio.h>
-#include <ncurses.h>
+#include "crossPlatformCurses.hpp"
 #include "config.hpp"
 
 #define ctrl(x) ((x) & 0x1f)
+
+#define DEFAULT_FILE_NAME "unnamed.txt"
 
 class EditorWindow
 {

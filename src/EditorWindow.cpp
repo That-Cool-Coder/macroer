@@ -2,7 +2,7 @@
 
 EditorWindow::EditorWindow(bool runNow)
 {
-    m_filename = "macroer-unnamed.sh";
+    m_filename = DEFAULT_FILE_NAME;
     // m_content always has a space at the end to make deleting work,
     // but users can't interact with it
     m_content = " ";
