@@ -31,45 +31,7 @@ EditorWindow::~EditorWindow()
 
 void EditorWindow::mainLoop()
 {
-    bool running = true;
-    do
-    {
-        updateCursorPos();
-        unsigned int c = getch();
-        switch(c)
-        {
-            case KEY_UP:
-                if (m_scrollAmountY > 0)
-                {
-                    m_scrollAmountY --;
-                    scrl(-1);
-                    tryRepaintLine(m_scrollAmountY);
-                }
-                break;
-            case KEY_DOWN:
-                m_scrollAmountY ++;
-                scrl(1);
-                tryRepaintLine(m_scrollAmountY + LINES);
-                break;
-            case KEY_LEFT:
-                if (m_cursorIndex > 0) m_cursorIndex --;
-                break;
-            case KEY_RIGHT:
-                if (m_cursorIndex < m_content.length() - 1) m_cursorIndex ++;
-                break;
-            case KEY_BACKSPACE:
-                deleteChar();
-                break;
-            case ctrl('x'):
-                close(false);
-                running = false;
-                break;
-            default:
-                insertChar(c);
-                break;
-        }
-        refresh();
-    } while (running);
+    std::cout << "Pretend editor is running...\n";
 }
 
 void EditorWindow::loadFromFile()
@@ -82,10 +44,6 @@ void EditorWindow::loadFromFile()
         std::istreambuf_iterator<char>()) + ' ';
 
     file.close();
-
-    // Write file to window
-    clear();
-    addstr(m_content.c_str());
 }
 
 void EditorWindow::save()
@@ -107,16 +65,16 @@ void EditorWindow::close(bool forceClose)
 	endwin();
 }
 
-
-
 void EditorWindow::setupCurses()
 {
-	WINDOW* win = initscr();
+	initscr();
 	cbreak();
     noecho();
     keypad(stdscr, true);
-    scrollok(win, true);
-    keypad(stdscr, true);
+
+    getmaxyx(stdscr, m_terminalRows m_terminalCols);
+
+    m_pad = newpad(m_terminalRows, m_terminalCols);
 }
 
 void EditorWindow::debugLog(char c)

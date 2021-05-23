@@ -34,6 +34,7 @@ void clearMacroFile()
     file << DEFAULT_MACRO_FILE_CONTENTS;
     file.close();
 }
+
 int main(int argc, char* argv[])
 {
     // Set the path to be local to the executable, not the working dir

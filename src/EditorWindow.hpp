@@ -11,7 +11,6 @@
 class EditorWindow
 {
 public:
-
     EditorWindow(bool runNow);
     EditorWindow(std::string filename, bool runNow);
     ~EditorWindow();
@@ -26,6 +25,9 @@ private:
     std::string m_content;
     int m_scrollAmountY;
     int m_cursorIndex;
+    int m_terminalCols;
+    int m_terminalRows;
+    WINDOW* m_pad;
 
     void setupCurses();
     void insertChar(char c);
