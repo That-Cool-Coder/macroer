@@ -11,8 +11,8 @@
 class EditorWindow
 {
 public:
-    EditorWindow(bool runNow);
-    EditorWindow(std::string filename, bool runNow);
+    EditorWindow();
+    EditorWindow(std::string filename);
     ~EditorWindow();
 
     void mainLoop();

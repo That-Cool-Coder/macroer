@@ -6,6 +6,7 @@
     #include <Windows.h>
 #else
     #include <unistd.h>
+    #include <limits.h>
 #endif
 
 std::string getFullExecutableName();

@@ -48,7 +48,10 @@ int main(int argc, char* argv[])
 
         // A switch-case can't work here because c doesn't like strings
         if (mode == std::string("edit"))
-            EditorWindow w(macroSaveFilePath, true);
+        {
+            EditorWindow w(macroSaveFilePath);
+            w.mainLoop();
+        }
         else if (mode == std::string("run")) 
             system(std::string('"' + macroSaveFilePath + '"').c_str());
         else if (mode == std::string("clear"))

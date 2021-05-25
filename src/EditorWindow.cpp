@@ -1,6 +1,6 @@
 #include "EditorWindow.hpp"
 
-EditorWindow::EditorWindow(bool runNow)
+EditorWindow::EditorWindow()
 {
     m_filename = DEFAULT_FILE_NAME;
     // m_content always has a space at the end to make deleting work,
@@ -10,18 +10,16 @@ EditorWindow::EditorWindow(bool runNow)
     m_scrollAmountY = 0;
 
     setupCurses();
-    if (runNow) mainLoop();
 }
 
-EditorWindow::EditorWindow(std::string filename, bool runNow)
+EditorWindow::EditorWindow(std::string filename)
 {
     m_filename = filename;
     m_cursorIndex = 0;
     m_scrollAmountY = 0;
 
     setupCurses();
-    loadFromFile();
-    if (runNow) mainLoop();
+    //loadFromFile();
 }
 
 EditorWindow::~EditorWindow()
@@ -31,12 +29,25 @@ EditorWindow::~EditorWindow()
 
 void EditorWindow::mainLoop()
 {
-    std::cout << "Pretend editor is running...\n";
+    bool running = true;
+    while (running)
+    {
+        char key = wgetch(m_pad);
+        if (key == ctrl('x'))
+        {
+            running = false;
+            close(true);
+        }
+        else
+        {
+            waddch(m_pad, key);
+        }
+        prefresh(m_pad, 0, 0, 0, 0, m_terminalRows, m_terminalCols);
+    }
 }
 
 void EditorWindow::loadFromFile()
 {
-
     std::ifstream file;
     file.open(m_filename);
     // Add trailing space (see constructor)
@@ -72,7 +83,7 @@ void EditorWindow::setupCurses()
     noecho();
     keypad(stdscr, true);
 
-    getmaxyx(stdscr, m_terminalRows m_terminalCols);
+    getmaxyx(stdscr, m_terminalRows, m_terminalCols);
 
     m_pad = newpad(m_terminalRows, m_terminalCols);
 }
