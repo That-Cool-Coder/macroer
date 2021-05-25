@@ -5,6 +5,8 @@
 #include "config.hpp"
 
 #define ctrl(x) ((x) & 0x1f)
+#define isbackspace(x) ((x) == KEY_BACKSPACE || (x) == 127 || (x) == '\b')
+#define istab(x) ((x) == '\t')
 
 #define DEFAULT_FILE_NAME "unnamed.txt"
 

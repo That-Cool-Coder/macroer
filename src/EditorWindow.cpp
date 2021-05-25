@@ -19,7 +19,7 @@ EditorWindow::EditorWindow(std::string filename)
     m_scrollAmountY = 0;
 
     setupCurses();
-    //loadFromFile();
+    loadFromFile();
 }
 
 EditorWindow::~EditorWindow()
@@ -29,20 +29,40 @@ EditorWindow::~EditorWindow()
 
 void EditorWindow::mainLoop()
 {
+    // Load the content into the pad
+    wclear(m_pad);
+    waddstr(m_pad, m_content.c_str());
+
     bool running = true;
     while (running)
     {
-        char key = wgetch(m_pad);
-        if (key == ctrl('x'))
+        prefresh(m_pad, m_scrollAmountY, 0, 0, 0, m_terminalRows, m_terminalCols);
+
+        int key = wgetch(m_pad);
+
+        switch(key)
         {
-            running = false;
-            close(true);
+            case ctrl('x'):
+                running = false;
+                close(false);
+                break;
+            case KEY_BACKSPACE:
+            case 127:
+            case '\b':
+                int prev_x, prev_y;
+                getyx(m_pad, prev_y, prev_x);
+                mvwdelch(m_pad, prev_y, prev_x - 1);
+                break;
+            case KEY_UP:
+                m_scrollAmountY -= 1;
+                break;
+            case KEY_DOWN:
+                m_scrollAmountY += 1;
+                break;
+            default:
+                m_content += key;
+                waddch(m_pad, (char) key);
         }
-        else
-        {
-            waddch(m_pad, key);
-        }
-        prefresh(m_pad, 0, 0, 0, 0, m_terminalRows, m_terminalCols);
     }
 }
 
@@ -52,7 +72,7 @@ void EditorWindow::loadFromFile()
     file.open(m_filename);
     // Add trailing space (see constructor)
     m_content = std::string((std::istreambuf_iterator<char>(file)),
-        std::istreambuf_iterator<char>()) + ' ';
+        std::istreambuf_iterator<char>());
 
     file.close();
 }
@@ -62,7 +82,7 @@ void EditorWindow::save()
     std::ofstream file;
     file.open(m_filename, std::ios::trunc);
     // Remove trailing space:
-    file << m_content.substr(0, m_content.length() - 1);
+    file << m_content;
 
     file.close();
 }
@@ -81,11 +101,12 @@ void EditorWindow::setupCurses()
 	initscr();
 	cbreak();
     noecho();
-    keypad(stdscr, true);
 
     getmaxyx(stdscr, m_terminalRows, m_terminalCols);
-
     m_pad = newpad(m_terminalRows, m_terminalCols);
+
+    keypad(stdscr, true);
+    keypad(m_pad, true);
 }
 
 void EditorWindow::debugLog(char c)
