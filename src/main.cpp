@@ -3,6 +3,7 @@
 #include "config.hpp"
 #include "getExecutableName.hpp"
 #include "EditorWindow.hpp"
+#include <filesystem>
 
 #if defined(WIN32) || defined(_WIN32)
     #define MACRO_SAVE_FILE_NAME std::string("macroer.bat")
@@ -14,11 +15,19 @@
 
 #define DEFAULT_MACRO_FILE_CONTENTS "# Welcome to macroer. To save and exit, press CTRL+X "
 
+namespace fs = std::filesystem;
+
 std::string macroSaveFilePath;
 
 void showIncorrectArgs()
 {
     std::cout << "Invalid mode (expected 'edit', 'run' or 'clear')\n";
+}
+
+void setMacroFilePerms()
+{
+    fs::permissions(macroSaveFilePath,
+        fs::perms::owner_all | fs::perms::group_all);
 }
 
 std::string folderFromPath(std::string str)
@@ -53,13 +62,18 @@ int main(int argc, char* argv[])
             w.mainLoop();
         }
         else if (mode == std::string("run")) 
+        {
+            setMacroFilePerms();
             system(std::string('"' + macroSaveFilePath + '"').c_str());
+        }
         else if (mode == std::string("clear"))
+        {
+            setMacroFilePerms();
             clearMacroFile();
+        }
         else
             showIncorrectArgs();
     }
     else showIncorrectArgs();
-    //std::cout << folderFromPath(std::string(argv[0]));
     
 }
