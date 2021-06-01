@@ -40,6 +40,9 @@ void EditorWindow::mainLoop()
 
         int key = wgetch(m_pad);
 
+        int cursorY, cursorX;
+        getyx(m_pad, cursorY, cursorX);
+
         switch(key)
         {
             case ctrl('x'):
@@ -49,15 +52,28 @@ void EditorWindow::mainLoop()
             case KEY_BACKSPACE:
             case 127:
             case '\b':
-                int prev_x, prev_y;
-                getyx(m_pad, prev_y, prev_x);
-                mvwdelch(m_pad, prev_y, prev_x - 1);
+                backspace();
                 break;
             case KEY_UP:
-                m_scrollAmountY -= 1;
+                if (m_scrollAmountY > 0)
+                {
+                    m_scrollAmountY -= 1;
+                    moveCursorBy(1, 0);
+                }
                 break;
             case KEY_DOWN:
+                // todo: if m_scrollAmountY < count(\n) then continue
                 m_scrollAmountY += 1;
+                moveCursorBy(-1, 0);
+                break;
+            case KEY_LEFT:
+                if (cursorY > 0)
+                {
+                    moveCursorBy(0, -1);
+                }
+                break;
+            case KEY_RIGHT:
+                moveCursorBy(0, 1);
                 break;
             default:
                 m_content += key;
@@ -108,6 +124,9 @@ void EditorWindow::setupCurses()
     keypad(stdscr, true);
     keypad(m_pad, true);
 }
+
+// Below here is private
+// ---------------------
 
 void EditorWindow::debugLog(char c)
 {
@@ -189,4 +208,53 @@ void EditorWindow::tryRepaintLine(int lineNum)
         addstr(crntLine.c_str());
         updateCursorPos();
     }
+}
+
+void EditorWindow::moveCursorBy(int yDist, int xDist)
+{
+    int crntY, crntX;
+    getyx(m_pad, crntY, crntX);
+    wmove(m_pad, crntY + yDist, crntX + xDist);
+}
+
+void EditorWindow::backspace()
+{
+    // Get cursor pos for later
+    int cursorY, cursorX;
+    getyx(m_pad, cursorY, cursorX);
+
+    // If at start of line, then try deleting last char of prev line
+    if (cursorX == 0)
+    {
+        // If this is the start of file then quit
+        if (cursorY == 0) return;
+
+        // Otherwise try to reach the end of the previous line
+        int x = 1000;
+        char crntChar;
+        do
+        {
+            crntChar = mvwinch(m_pad, cursorY - 1, x) & A_CHARTEXT;
+            x --;
+        } while (crntChar != 0 && x > 0);
+
+        int endOfLastLine = x + 1;
+        wmove(m_pad, cursorY - 1, endOfLastLine);
+        waddch(m_pad, '!');
+        mvwdelch(m_pad, cursorY - 1, endOfLastLine);
+    }
+    else
+    {
+        mvwdelch(m_pad, cursorY, cursorX - 1);
+    }
+}
+
+int EditorWindow::getLineLength(int lineNum)
+{
+    // save the previous cursor pos so we can restore it
+    // move the cursor to the far right of the screen on lineNum
+    // start moving to the left until we reach a non empty character
+    // the position one to the right of the pos reached is line length
+    // restore the original cursor pos
+    // return pos
 }

@@ -38,4 +38,7 @@ private:
     void tryRepaintLine(int lineNum);
     void debugLog(char c);
     void debugLog(std::string s);
+    void moveCursorBy(int y, int x);
+    void backspace();
+    int getLineLength(int lineNum);
 };
